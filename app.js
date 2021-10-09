@@ -26,8 +26,11 @@ function cadastrarDespesas() {
         descricao.value,
         valor.value
     )
+    
+    gravar(despesa)    
+}
 
-    console.log(despesa)
-     
+function gravar(d) {
+    localStorage.setItem('despesa', JSON.stringify(d))
 }
 
