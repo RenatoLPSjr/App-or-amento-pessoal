@@ -39,6 +39,26 @@ class Bd {
 
         localStorage.setItem('id', id)
     }
+
+    recuperarTodosRegistros() {
+        //Array das despesas
+        let despesas = Array()
+        
+        let id = localStorage.getItem('id')
+        //recupera todas as despesas cadastradas em locais storage
+        for (let i = 1; i <= id; i++) {
+
+             let despesa = JSON.parse(localStorage.getItem(i))
+
+             if(despesa === null) {
+                 continue
+             }
+
+            despesas.push(despesa)
+        }
+
+        return despesas
+    }
 }
 
 let bd = new Bd()
@@ -62,6 +82,9 @@ function cadastrarDespesas() {
     )
     
     if(despesa.validarDados()) {
+
+        bd.gravar(despesa)   
+         
         document.getElementById('modal_titulo').innerHTML = 'Registro realizado com sucesso'
         document.getElementById('modal_titulo_div').className = 'modal-header text-success'
         document.getElementById('modal_conteudo').innerHTML = 'Despesa cadastrada com sucesso!'
@@ -69,6 +92,13 @@ function cadastrarDespesas() {
         document.getElementById('modal_btn').className = 'btn btn-sucess'
 
         $('#modalRegistroDespesa').modal('show')
+
+        ano.value = ''
+        mes.value = ''
+        dia.value = ''
+        tipo.value = ''
+        descricao.value = ''
+        valor.value = ''
         
     } else {
         document.getElementById('modal_titulo').innerHTML = 'Erro na inclusão de registro'
@@ -79,7 +109,45 @@ function cadastrarDespesas() {
 
         $('#modalRegistroDespesa').modal('show')
     }
-   bd.gravar(despesa)    
+       
+}
+
+function carregaListaDespesas() {
+
+    let despesas = Array()
+    despesas = bd.recuperarTodosRegistros()
+    //Selecionando o Elemento TBody da tabela
+    var listaDespesas = document.getElementById('listaDespesas')
+
+    despesas.forEach(function(d) {
+        
+        //criando o TR
+
+        let linha = listaDespesas.insertRow()
+
+        //criando o TD 
+
+        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
+
+
+        //ajustar o tipo
+        switch(d.tipo) {
+            case '1': d.tipo = 'Alimentação'
+                break
+            case '2': d.tipo = 'Educação'
+                break     
+            case '3': d.tipo = 'Lazer'
+                break
+            case '4': d.tipo = 'Saúde'
+                break     
+            case '5': d.tipo = 'Transporte'
+                break  
+        }
+
+        linha.insertCell(1).innerHTML = d.tipo
+        linha.insertCell(2).innerHTML = d.descricao
+        linha.insertCell(3).innerHTML = d.valor
+    })
 }
 
 
