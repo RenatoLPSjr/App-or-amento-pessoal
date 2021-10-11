@@ -59,6 +59,41 @@ class Bd {
 
         return despesas
     }
+
+    pesquisar(despesa) {
+
+        let despesasFiltradas = Array()
+        despesasFiltradas = this.recuperarTodosRegistros()
+
+        console.log(despesasFiltradas)
+        console.log(despesa)
+
+        if(despesa.ano != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.ano == despesa.ano)
+        }
+
+        if(despesa.mes != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.mes == despesa.mes)
+        }
+
+        if(despesa.dia != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.dia == despesa.dia)
+        }
+
+        if(despesa.tipo != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.tipo == despesa.tipo)
+        }
+
+        if(despesa.descricao != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.descricao == despesa.descricao)
+        }
+
+        if(despesa.valor != '') {
+            despesasFiltradas = despesasFiltradas.filter(d => d.valor == despesa.valor)
+        }
+
+        return despesasFiltradas
+    }
 }
 
 let bd = new Bd()
@@ -84,7 +119,7 @@ function cadastrarDespesas() {
     if(despesa.validarDados()) {
 
         bd.gravar(despesa)   
-         
+
         document.getElementById('modal_titulo').innerHTML = 'Registro realizado com sucesso'
         document.getElementById('modal_titulo_div').className = 'modal-header text-success'
         document.getElementById('modal_conteudo').innerHTML = 'Despesa cadastrada com sucesso!'
@@ -112,12 +147,15 @@ function cadastrarDespesas() {
        
 }
 
-function carregaListaDespesas() {
+function carregaListaDespesas(despesas = Array(), filtro = false) {
 
-    let despesas = Array()
-    despesas = bd.recuperarTodosRegistros()
+    if(despesas.length == 0 && filtro == false) {
+        despesas = bd.recuperarTodosRegistros()
+    }
+
     //Selecionando o Elemento TBody da tabela
     var listaDespesas = document.getElementById('listaDespesas')
+    listaDespesas.innerHTML = ''
 
     despesas.forEach(function(d) {
         
@@ -148,6 +186,59 @@ function carregaListaDespesas() {
         linha.insertCell(2).innerHTML = d.descricao
         linha.insertCell(3).innerHTML = d.valor
     })
+}
+
+function pesquisarDespesa() {
+    let ano = document.getElementById('ano').value
+    let mes= document.getElementById('mes').value
+    let dia = document.getElementById('dia').value
+    let tipo = document.getElementById('tipo').value
+    let descricao = document.getElementById('descricao').value
+    let valor = document.getElementById('valor').value
+
+    let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+    
+    let despesas = bd.pesquisar(despesa) 
+    
+    this.carregaListaDespesas(despesas, true)
+
+    //-----------------------------
+
+    let listaDespesas = document.getElementById('listaDespesas')
+    listaDespesas.innerHTML = ''
+
+    despesas.forEach(function(d) {
+        
+        //criando o TR
+
+        let linha = listaDespesas.insertRow()
+
+        //criando o TD 
+
+        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
+
+
+        //ajustar o tipo
+        switch(d.tipo) {
+            case '1': d.tipo = 'Alimentação'
+                break
+            case '2': d.tipo = 'Educação'
+                break     
+            case '3': d.tipo = 'Lazer'
+                break
+            case '4': d.tipo = 'Saúde'
+                break     
+            case '5': d.tipo = 'Transporte'
+                break  
+        }
+
+        linha.insertCell(1).innerHTML = d.tipo
+        linha.insertCell(2).innerHTML = d.descricao
+        linha.insertCell(3).innerHTML = d.valor
+    })
+    
+    
+
 }
 
 
